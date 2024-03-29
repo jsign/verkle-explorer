@@ -30,13 +30,15 @@ type txContext struct {
 func HandlerGetTx(db database.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var tmpl = template.Must(template.ParseFiles("webtemplate/tx.html"))
-		txHash := r.PathValue("hash")
+
+		txHash := r.URL.Query().Get("hash")
 
 		if txHash == "" {
 			if err := tmpl.Execute(w, nil); err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
+			return
 		}
 
 		txCtx := txContext{Hash: txHash}
@@ -58,6 +60,8 @@ func HandlerGetTx(db database.DB) func(w http.ResponseWriter, r *http.Request) {
 			txCtx.ExecutedBytes = txExec.ExecutedBytes
 			txCtx.ChargedBytes = txExec.ChargedBytes
 			txCtx.ExecutionEfficiency = fmt.Sprintf("%0.02f", float64(txCtx.ExecutedBytes)/float64(txCtx.ChargedBytes))
+
+			txCtx.WitnessEvents = txExec.Events
 		}
 		if err := tmpl.Execute(w, txCtx); err != nil {
 			log.Printf("failed to execute template: %v", err)

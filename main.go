@@ -29,7 +29,8 @@ func main() {
 
 	mux := http.NewServeMux()
 	configureStaticFiles(mux)
-	mux.HandleFunc("/tx/{hash}", handlers.HandlerGetTx(db))
+	mux.HandleFunc("/tx", handlers.HandlerGetTx(db))
+	mux.HandleFunc("/", handlers.HandlerGetTx(db))
 
 	server := http.Server{Addr: ":8181", Handler: mux}
 	if err := server.ListenAndServe(); err != nil {
