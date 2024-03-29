@@ -1,74 +1,39 @@
 package main
 
 import (
-	"fmt"
-	"html/template"
 	"log"
 	"net/http"
+
+	"github.com/jsign/verkle-explorer/database"
+	"github.com/jsign/verkle-explorer/database/mock"
+	"github.com/jsign/verkle-explorer/handlers"
 )
 
 func main() {
+	db := mock.NewMockDB([]database.TxExec{
+		{
+			Hash:                 "0xc6a03a1cc3678f83d5a62de0bf8ca6f1fc0ee46aea90f0ea7a6c56890e0e0613",
+			TotalGas:             4300,
+			CodeChunkGas:         1200,
+			ExecutedInstructions: 120,
+			ExecutedBytes:        125,
+			ChargedBytes:         62,
+			Events: []database.WitnessEvent{
+				{Name: "ContractInit", Gas: 100},
+				{Name: "TouchFullAddress", Gas: 200},
+				{Name: "TouchAddressOnWrite", Gas: 500},
+				{Name: "ContractInitiCompletion", Gas: 800},
+			},
+		},
+	})
+
 	mux := http.NewServeMux()
 	configureStaticFiles(mux)
+	mux.HandleFunc("/tx/{hash}", handlers.HandlerGetTx(db))
 
-	mux.HandleFunc("/tx", handlerTx)
-
-	server := http.Server{
-		Addr:    ":8181",
-		Handler: mux,
-	}
+	server := http.Server{Addr: ":8181", Handler: mux}
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("server failed to start: %v", err)
-	}
-}
-
-func handlerTx(w http.ResponseWriter, r *http.Request) {
-	var tmpl = template.Must(template.ParseFiles("webtemplate/tx.html"))
-	type witnessEvent struct {
-		Name string
-		Gas  int
-	}
-	type txContext struct {
-		ID string
-
-		TotalGas               int
-		ExecutionGas           int
-		ExecutionGasPercentage int
-		CodeChunkGas           int
-		CodeChunkGasPercentage int
-
-		ExecutedInstructions int
-		ExecutedBytes        int
-		ChargedBytes         int
-		ExecutionEfficiency  string
-
-		WitnessEvents []witnessEvent
-	}
-	data := txContext{
-		ID: "0xc6a03a1cc3678f83d5a62de0bf8ca6f1fc0ee46aea90f0ea7a6c56890e0e0613",
-
-		TotalGas:     4300,
-		ExecutionGas: 3150,
-
-		ExecutedInstructions: 120,
-		ExecutedBytes:        125,
-		ChargedBytes:         62,
-
-		WitnessEvents: []witnessEvent{
-			{Name: "ContractInit", Gas: 100},
-			{Name: "TouchFullAddress", Gas: 200},
-			{Name: "TouchAddressOnWrite", Gas: 500},
-			{Name: "ContractInitiCompletion", Gas: 800},
-		},
-	}
-	data.CodeChunkGas = data.TotalGas - data.ExecutionGas
-	data.ExecutionGasPercentage = data.ExecutionGas * 100 / data.TotalGas
-	data.CodeChunkGasPercentage = 100 - data.ExecutionGasPercentage
-
-	data.ExecutionEfficiency = fmt.Sprintf("%0.02f", float64(data.ExecutedBytes)/float64(data.ChargedBytes))
-	if err := tmpl.Execute(w, data); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
 	}
 }
 
