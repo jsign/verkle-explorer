@@ -2,11 +2,9 @@ package main
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/jsign/verkle-explorer/database"
 	"github.com/jsign/verkle-explorer/database/mock"
-	"github.com/jsign/verkle-explorer/handlers"
 )
 
 func main() {
@@ -27,31 +25,8 @@ func main() {
 		},
 	})
 
-	mux := http.NewServeMux()
-	configureStaticFiles(mux)
-	mux.HandleFunc("/tx", handlers.HandlerGetTx(db))
-	mux.HandleFunc("/", handlers.HandlerGetTx(db))
-
-	server := http.Server{Addr: ":8181", Handler: mux}
-	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf("server failed to start: %v", err)
+	explorer := New(":8181", db)
+	if err := explorer.Run(); err != nil {
+		log.Fatalf("error running server: %v", err)
 	}
-}
-
-func configureStaticFiles(mux *http.ServeMux) {
-	css := http.FileServer(http.Dir("webtemplate/css/"))
-	mux.Handle("/css/", http.StripPrefix("/css/", css))
-
-	img := http.FileServer(http.Dir("webtemplate/img/"))
-	mux.Handle("/img/", http.StripPrefix("/img/", img))
-
-	js := http.FileServer(http.Dir("webtemplate/js/"))
-	mux.Handle("/js/", http.StripPrefix("/js/", js))
-
-	scss := http.FileServer(http.Dir("webtemplate/scss/"))
-	mux.Handle("/scss/", http.StripPrefix("/scss/", scss))
-
-	vendor := http.FileServer(http.Dir("webtemplate/vendor/"))
-	mux.Handle("/vendor/", http.StripPrefix("/vendor/", vendor))
-
 }
