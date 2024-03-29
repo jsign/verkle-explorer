@@ -1,13 +1,16 @@
-package main
+package server
 
 import (
 	"fmt"
 	"net/http"
 	"sync"
+	"text/template"
 
 	"github.com/jsign/verkle-explorer/database"
 	"github.com/jsign/verkle-explorer/handlers"
 )
+
+const prefix = "/home/ignacio/code/verkle-explorer/"
 
 type WitnessExplorer struct {
 	lock    sync.Mutex
@@ -18,8 +21,10 @@ type WitnessExplorer struct {
 func New(addr string, db database.DB) *WitnessExplorer {
 	mux := http.NewServeMux()
 	configureStaticFiles(mux)
-	mux.HandleFunc("/tx", handlers.HandlerGetTx(db))
-	mux.HandleFunc("/", handlers.HandlerGetTx(db))
+
+	var tmpl = template.Must(template.ParseFiles(prefix + "webtemplate/tx.html"))
+	mux.HandleFunc("/tx", handlers.HandlerGetTx(tmpl, db))
+	mux.HandleFunc("/", handlers.HandlerGetTx(tmpl, db))
 
 	return &WitnessExplorer{server: http.Server{Addr: addr, Handler: mux}}
 }
@@ -44,19 +49,11 @@ func (s *WitnessExplorer) Close() error {
 }
 
 func configureStaticFiles(mux *http.ServeMux) {
-	css := http.FileServer(http.Dir("webtemplate/css/"))
-	mux.Handle("/css/", http.StripPrefix("/css/", css))
+	paths := []string{"css", "img", "js", "scss", "vendor"}
 
-	img := http.FileServer(http.Dir("webtemplate/img/"))
-	mux.Handle("/img/", http.StripPrefix("/img/", img))
+	for _, path := range paths {
+		incl := http.FileServer(http.Dir(prefix + "webtemplate/" + path))
+		mux.Handle("/"+path+"/", http.StripPrefix("/"+path+"/", incl))
 
-	js := http.FileServer(http.Dir("webtemplate/js/"))
-	mux.Handle("/js/", http.StripPrefix("/js/", js))
-
-	scss := http.FileServer(http.Dir("webtemplate/scss/"))
-	mux.Handle("/scss/", http.StripPrefix("/scss/", scss))
-
-	vendor := http.FileServer(http.Dir("webtemplate/vendor/"))
-	mux.Handle("/vendor/", http.StripPrefix("/vendor/", vendor))
-
+	}
 }

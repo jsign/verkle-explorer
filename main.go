@@ -5,6 +5,7 @@ import (
 
 	"github.com/jsign/verkle-explorer/database"
 	"github.com/jsign/verkle-explorer/database/mock"
+	"github.com/jsign/verkle-explorer/server"
 )
 
 func main() {
@@ -25,7 +26,7 @@ func main() {
 		},
 	})
 
-	explorer := New(":8181", db)
+	explorer := server.New(":8181", db)
 	if err := explorer.Run(); err != nil {
 		log.Fatalf("error running server: %v", err)
 	}

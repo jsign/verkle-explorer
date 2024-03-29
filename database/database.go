@@ -11,11 +11,11 @@ type DB interface {
 type TxExec struct {
 	Hash string
 
-	TotalGas     int
-	CodeChunkGas int
+	TotalGas     uint64
+	CodeChunkGas uint64
 
 	ExecutedInstructions int
-	ExecutedBytes        int
+	ExecutedBytes        uint64
 	ChargedBytes         int
 
 	Events []WitnessEvent

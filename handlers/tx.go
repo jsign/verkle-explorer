@@ -13,24 +13,22 @@ type txContext struct {
 	Hash   string
 	Exists bool
 
-	TotalGas               int
-	ExecutionGas           int
+	TotalGas               uint64
+	ExecutionGas           uint64
 	ExecutionGasPercentage int
-	CodeChunkGas           int
+	CodeChunkGas           uint64
 	CodeChunkGasPercentage int
 
 	ExecutedInstructions int
-	ExecutedBytes        int
+	ExecutedBytes        uint64
 	ChargedBytes         int
 	ExecutionEfficiency  string
 
 	WitnessEvents []database.WitnessEvent
 }
 
-func HandlerGetTx(db database.DB) func(w http.ResponseWriter, r *http.Request) {
+func HandlerGetTx(tmpl *template.Template, db database.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var tmpl = template.Must(template.ParseFiles("webtemplate/tx.html"))
-
 		txHash := r.URL.Query().Get("hash")
 
 		if txHash == "" {
@@ -52,7 +50,7 @@ func HandlerGetTx(db database.DB) func(w http.ResponseWriter, r *http.Request) {
 
 			txCtx.TotalGas = txExec.TotalGas
 			txCtx.ExecutionGas = txExec.TotalGas - txExec.CodeChunkGas
-			txCtx.ExecutionGasPercentage = txCtx.ExecutionGas * 100 / txCtx.TotalGas
+			txCtx.ExecutionGasPercentage = int(txCtx.ExecutionGas * 100 / txCtx.TotalGas)
 			txCtx.CodeChunkGas = txExec.CodeChunkGas
 			txCtx.CodeChunkGasPercentage = 100 - txCtx.ExecutionGasPercentage
 
