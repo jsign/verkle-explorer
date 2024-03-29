@@ -11,7 +11,7 @@ func main() {
 	mux := http.NewServeMux()
 	configureStaticFiles(mux)
 
-	mux.HandleFunc("/tx", handleLulz)
+	mux.HandleFunc("/tx", handlerTx)
 
 	server := http.Server{
 		Addr:    ":8181",
@@ -22,7 +22,7 @@ func main() {
 	}
 }
 
-func handleLulz(w http.ResponseWriter, r *http.Request) {
+func handlerTx(w http.ResponseWriter, r *http.Request) {
 	var tmpl = template.Must(template.ParseFiles("webtemplate/tx.html"))
 	type witnessEvent struct {
 		Name string
@@ -37,9 +37,10 @@ func handleLulz(w http.ResponseWriter, r *http.Request) {
 		CodeChunkGas           int
 		CodeChunkGasPercentage int
 
-		TouchedCodeChunks int
-		ChargedCodeChunks int
-		ChunkEfficiency   string
+		ExecutedInstructions int
+		ExecutedBytes        int
+		ChargedBytes         int
+		ExecutionEfficiency  string
 
 		WitnessEvents []witnessEvent
 	}
@@ -49,8 +50,9 @@ func handleLulz(w http.ResponseWriter, r *http.Request) {
 		TotalGas:     4300,
 		ExecutionGas: 3150,
 
-		TouchedCodeChunks: 120,
-		ChargedCodeChunks: 34,
+		ExecutedInstructions: 120,
+		ExecutedBytes:        125,
+		ChargedBytes:         62,
 
 		WitnessEvents: []witnessEvent{
 			{Name: "ContractInit", Gas: 100},
@@ -63,7 +65,7 @@ func handleLulz(w http.ResponseWriter, r *http.Request) {
 	data.ExecutionGasPercentage = data.ExecutionGas * 100 / data.TotalGas
 	data.CodeChunkGasPercentage = 100 - data.ExecutionGasPercentage
 
-	data.ChunkEfficiency = fmt.Sprintf("%0.02f", float64(data.TouchedCodeChunks)/float64(data.ChargedCodeChunks))
+	data.ExecutionEfficiency = fmt.Sprintf("%0.02f", float64(data.ExecutedBytes)/float64(data.ChargedBytes))
 	if err := tmpl.Execute(w, data); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
