@@ -57,7 +57,10 @@ func HandlerGetTx(tmpl *template.Template, db database.DB) func(w http.ResponseW
 			txCtx.ExecutedInstructions = txExec.ExecutedInstructions
 			txCtx.ExecutedBytes = txExec.ExecutedBytes
 			txCtx.ChargedBytes = txExec.ChargedBytes
-			txCtx.ExecutionEfficiency = fmt.Sprintf("%0.02f", float64(txCtx.ExecutedBytes)/float64(txCtx.ChargedBytes))
+			txCtx.ExecutionEfficiency = "N/A"
+			if txCtx.ChargedBytes > 0 {
+				txCtx.ExecutionEfficiency = fmt.Sprintf("%0.02f", float64(txCtx.ExecutedBytes)/float64(txCtx.ChargedBytes))
+			}
 
 			txCtx.WitnessEvents = txExec.Events
 		}
