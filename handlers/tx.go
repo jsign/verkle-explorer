@@ -3,15 +3,22 @@ package handlers
 import (
 	"fmt"
 	"log"
+	"math/big"
 	"net/http"
 	"text/template"
 
 	"github.com/jsign/verkle-explorer/database"
+	"github.com/shopspring/decimal"
 )
 
 type txContext struct {
 	Hash   string
 	Exists bool
+
+	BlockNumber uint64
+	From        string
+	To          string
+	Value       string
 
 	TotalGas               uint64
 	ExecutionGas           uint64
@@ -47,6 +54,14 @@ func HandlerGetTx(tmpl *template.Template, db database.DB) func(w http.ResponseW
 		}
 		if err == nil {
 			txCtx.Exists = true
+
+			txCtx.BlockNumber = txExec.BlockNumber
+			txCtx.From = txExec.From
+			txCtx.To = txExec.To
+			var biValue big.Int
+			biValue.SetString(txExec.Value, 10)
+			value := decimal.NewFromBigInt(&biValue, -18)
+			txCtx.Value = value.String()
 
 			txCtx.TotalGas = txExec.TotalGas
 			txCtx.ExecutionGas = txExec.TotalGas - txExec.CodeChunkGas

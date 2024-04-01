@@ -1,6 +1,8 @@
 package database
 
-import "errors"
+import (
+	"errors"
+)
 
 var ErrTxNotFound = errors.New("tx doesn't exist")
 
@@ -10,6 +12,11 @@ type DB interface {
 
 type TxExec struct {
 	Hash string
+
+	BlockNumber uint64
+	From        string
+	To          string
+	Value       string
 
 	TotalGas     uint64
 	CodeChunkGas uint64

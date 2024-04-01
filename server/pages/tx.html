@@ -61,6 +61,32 @@
 
                     <!-- Content Row -->
                     <div class="row">
+                        <div class="col mb-4">
+                            <div class="card shadow mb-4">
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Info</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col-1 mr-2">
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">Block {{ .BlockNumber }}
+                                            </div>
+                                        </div>
+                                        <div class="col mr-2">
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ .From
+                                                }} --- {{
+                                                .Value }} ETH ---> {{
+                                                .To }} </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Row -->
+                    <div class="row">
                         <div class="col-4 mb-4">
                             <div class="card border-left-secondary shadow h-100 py-2">
                                 <div class="card-body">
@@ -155,20 +181,23 @@
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                                 Executed instructions</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ .ExecutedInstructions
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{
+                                                .ExecutedInstructions
                                                 }}
                                             </div>
                                         </div>
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                                 Executed bytes</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ .ExecutedBytes}}
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{
+                                                .ExecutedBytes}}
                                             </div>
                                         </div>
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                                 Charged bytes</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ .ChargedBytes }}
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ .ChargedBytes
+                                                }}
                                             </div>
                                         </div>
                                         <div class="col mr-2">
