@@ -54,32 +54,49 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     {{ if .Exists }}
-                    <!-- Page Heading -->
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h4 mb-0 text-gray-800">Transaction {{ .Hash }}</h1>
-                    </div>
-
                     <!-- Content Row -->
                     <div class="row">
                         <div class="col mb-4">
                             <div class="card shadow mb-4">
                                 <div
                                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Info</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Transaction {{ .Hash }}</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
-                                        <div class="col-1 mr-2">
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">Block {{ .BlockNumber }}
-                                            </div>
+                                        <div class="col-1 mr-1">
+                                            <div class="h5 mb-0 text-gray-800">From</div>
                                         </div>
                                         <div class="col mr-2">
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ .From
-                                                }} --- {{
-                                                .Value }} ETH ---> {{
-                                                .To }} </div>
+                                            <div class="h5 mb-0  text-gray-800">{{ .From }}</div>
+                                        </div>
+
+                                    </div>
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col-1 mr-1">
+                                            <div class="h5 mb-0  text-gray-800">To</div>
+                                        </div>
+                                        <div class="col mr-2">
+                                            <div class="h5 mb-0  text-gray-800">{{ .To }}</div>
                                         </div>
                                     </div>
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col-1 mr-1">
+                                            <div class="h5 mb-0  text-gray-800">Value</div>
+                                        </div>
+                                        <div class="col mr-2">
+                                            <div class="h5 mb-0  text-gray-800">{{ .Value }} ETH</div>
+                                        </div>
+                                    </div>
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col-1 mt-3">
+                                            <div class="h5 mb-0  text-gray-800">Block number</div>
+                                        </div>
+                                        <div class="col mr-2">
+                                            <div class="h5 mb-0  text-gray-800">{{ .BlockNumber }}</div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -253,10 +270,45 @@
                                             <div class="text-secondary mb-1">
                                                 {{ .Gas }} </div>
                                         </div>
-
                                         <div class="col mr-2">
                                             <div class="text-secondary mb-1">
                                                 {{ .Params }} </div>
+                                        </div>
+                                    </div>
+                                    {{ end }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card shadow mb-4">
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Witness Key-Values</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div
+                                                class="text font-weight-bold text-secondary text-gray-800 text-uppercase mb-2">
+                                                Key</div>
+                                        </div>
+                                        <div class="col mr-2">
+                                            <div
+                                                class="text font-weight-bold text-secondary text-gray-800 text-uppercase mb-2">
+                                                Post-value</div>
+                                        </div>
+                                    </div>
+                                    {{ range .WitnessTreeKeyValues}}
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-secondary mb-1">
+                                                {{ .Key }}</div>
+                                        </div>
+                                        <div class="col mr-2">
+                                            <div class="text-secondary mb-1">
+                                                {{ .PostValue }} </div>
                                         </div>
                                     </div>
                                     {{ end }}

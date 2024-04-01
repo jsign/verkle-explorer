@@ -31,7 +31,8 @@ type txContext struct {
 	ChargedBytes         int
 	ExecutionEfficiency  string
 
-	WitnessEvents []database.WitnessEvent
+	WitnessEvents        []database.WitnessEvent
+	WitnessTreeKeyValues []database.WitnessTreeKeyValue
 }
 
 func HandlerGetTx(tmpl *template.Template, db database.DB) func(w http.ResponseWriter, r *http.Request) {
@@ -78,6 +79,8 @@ func HandlerGetTx(tmpl *template.Template, db database.DB) func(w http.ResponseW
 			}
 
 			txCtx.WitnessEvents = txExec.Events
+
+			txCtx.WitnessTreeKeyValues = txExec.WitnessTreeKeyValues
 		}
 		if err := tmpl.Execute(w, txCtx); err != nil {
 			log.Printf("failed to execute template: %v", err)

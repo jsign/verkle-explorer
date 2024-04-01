@@ -25,11 +25,17 @@ type TxExec struct {
 	ExecutedBytes        uint64
 	ChargedBytes         int
 
-	Events []WitnessEvent
+	Events               []WitnessEvent
+	WitnessTreeKeyValues []WitnessTreeKeyValue
 }
 
 type WitnessEvent struct {
 	Name   string
 	Gas    uint64
 	Params string
+}
+
+type WitnessTreeKeyValue struct {
+	Key       string
+	PostValue string
 }
