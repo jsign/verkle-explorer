@@ -23,6 +23,6 @@ type TxExec struct {
 
 type WitnessEvent struct {
 	Name   string
-	Gas    int
+	Gas    uint64
 	Params string
 }
