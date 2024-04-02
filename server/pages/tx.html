@@ -50,7 +50,7 @@
                     </form>
                 </nav>
                 <!-- End of Topbar -->
-                {{ if.Hash }}
+                {{ if not .IsDashboard }}
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     {{ if .Exists }}
@@ -321,6 +321,59 @@
                         <h1 class="h4 mb-0 text-gray-800">Transaction not found!</h1>
                     </div>
                     {{ end }}
+                </div>
+                {{ else }}
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card shadow mb-4">
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Top 10 - Highest gas txs</h6>
+                                </div>
+                                <div class="card-body">
+                                    {{ range .TopHighestGas}}
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-secondary mb-1">
+                                                <a href="/tx?hash={{.Hash}}">{{ .Hash }}</a>
+                                            </div>
+                                        </div>
+                                        <div class=" col mr-2">
+                                            <div class="text-secondary mb-1">
+                                                {{ .Detail }} </div>
+                                        </div>
+                                    </div>
+                                    {{ end }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card shadow mb-4">
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Top 10 - Most inefficient
+                                        code-access
+                                        txs</h6>
+                                </div>
+                                <div class="card-body">
+                                    {{ range .TopInefficientCodeAccess}}
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-secondary mb-1">
+                                                <a href="/tx?hash={{.Hash}}">{{ .Hash }}</a>
+                                            </div>
+                                        </div>
+                                        <div class="col mr-2">
+                                            <div class="text-secondary mb-1">
+                                                {{ .Detail }} </div>
+                                        </div>
+                                    </div>
+                                    {{ end }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 {{ end }}
             </div>

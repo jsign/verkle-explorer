@@ -22,3 +22,11 @@ func (db *mockDB) GetTxExec(hash string) (database.TxExec, error) {
 	}
 	return database.TxExec{}, database.ErrTxNotFound
 }
+
+func (db *mockDB) GetHighestGasTxs(count int) ([]database.TxInfo, error) {
+	return []database.TxInfo{db.data[0].TxInfo}, nil
+}
+
+func (db *mockDB) GetInefficientCodeAccessTxs(count int) ([]database.TxInfo, error) {
+	return []database.TxInfo{db.data[0].TxInfo}, nil
+}

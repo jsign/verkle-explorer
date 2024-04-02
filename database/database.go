@@ -8,9 +8,18 @@ var ErrTxNotFound = errors.New("tx doesn't exist")
 
 type DB interface {
 	GetTxExec(hash string) (TxExec, error)
+	GetHighestGasTxs(count int) ([]TxInfo, error)
+	GetInefficientCodeAccessTxs(count int) ([]TxInfo, error)
 }
 
 type TxExec struct {
+	TxInfo
+
+	Events               []WitnessEvent
+	WitnessTreeKeyValues []WitnessTreeKeyValue
+}
+
+type TxInfo struct {
 	Hash string
 
 	BlockNumber uint64
@@ -18,15 +27,12 @@ type TxExec struct {
 	To          string
 	Value       string
 
-	TotalGas     uint64
-	CodeChunkGas uint64
+	TotalGas          uint64
+	CodeChunkGas      uint64
+	ChargedCodeChunks int
 
 	ExecutedInstructions int
 	ExecutedBytes        uint64
-	ChargedBytes         int
-
-	Events               []WitnessEvent
-	WitnessTreeKeyValues []WitnessTreeKeyValue
 }
 
 type WitnessEvent struct {

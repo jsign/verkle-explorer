@@ -12,6 +12,8 @@ import (
 )
 
 type txContext struct {
+	IsDashboard bool
+
 	Hash   string
 	Exists bool
 
@@ -35,15 +37,23 @@ type txContext struct {
 	WitnessTreeKeyValues []database.WitnessTreeKeyValue
 }
 
+type dashboardContext struct {
+	IsDashboard              bool
+	TopHighestGas            []txListItem
+	TopInefficientCodeAccess []txListItem
+}
+
+type txListItem struct {
+	Hash   string
+	Detail string
+}
+
 func HandlerGetTx(tmpl *template.Template, db database.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		txHash := r.URL.Query().Get("hash")
 
 		if txHash == "" {
-			if err := tmpl.Execute(w, nil); err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
+			outputDashboard(db, tmpl, w)
 			return
 		}
 
@@ -72,7 +82,7 @@ func HandlerGetTx(tmpl *template.Template, db database.DB) func(w http.ResponseW
 
 			txCtx.ExecutedInstructions = txExec.ExecutedInstructions
 			txCtx.ExecutedBytes = txExec.ExecutedBytes
-			txCtx.ChargedBytes = txExec.ChargedBytes
+			txCtx.ChargedBytes = txExec.ChargedCodeChunks * 31
 			txCtx.ExecutionEfficiency = "N/A"
 			if txCtx.ChargedBytes > 0 {
 				txCtx.ExecutionEfficiency = fmt.Sprintf("%0.02fx", float64(txCtx.ExecutedBytes)/float64(txCtx.ChargedBytes))
@@ -87,5 +97,36 @@ func HandlerGetTx(tmpl *template.Template, db database.DB) func(w http.ResponseW
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+	}
+}
+
+func outputDashboard(db database.DB, tmpl *template.Template, w http.ResponseWriter) {
+	highGasTxs, err := db.GetHighestGasTxs(10)
+	if err != nil {
+		log.Printf("failed to execute template: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	inefficientTxs, err := db.GetInefficientCodeAccessTxs(10)
+	if err != nil {
+		log.Printf("failed to execute template: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	dashboardContext := dashboardContext{
+		IsDashboard:              true,
+		TopHighestGas:            make([]txListItem, len(highGasTxs)),
+		TopInefficientCodeAccess: make([]txListItem, len(inefficientTxs)),
+	}
+	for i, hgt := range highGasTxs {
+		dashboardContext.TopHighestGas[i] = txListItem{Hash: hgt.Hash, Detail: fmt.Sprintf("%d", hgt.TotalGas)}
+	}
+	for i, hgt := range inefficientTxs {
+		dashboardContext.TopInefficientCodeAccess[i] = txListItem{Hash: hgt.Hash, Detail: fmt.Sprintf("%0.02fx", float64(hgt.ExecutedBytes)/float64(hgt.ChargedCodeChunks*31))}
+	}
+	if err := tmpl.Execute(w, dashboardContext); err != nil {
+		log.Printf("failed to execute template: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 }
