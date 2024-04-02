@@ -15,7 +15,7 @@ type DB interface {
 type TxExec struct {
 	TxInfo
 
-	Events               []WitnessEvent
+	WitnessEvents        []WitnessEvent
 	WitnessTreeKeyValues []WitnessTreeKeyValue
 }
 
@@ -42,6 +42,7 @@ type WitnessEvent struct {
 }
 
 type WitnessTreeKeyValue struct {
-	Key       string
-	PostValue string
+	Key          string
+	CurrentValue string
+	PostValue    string
 }

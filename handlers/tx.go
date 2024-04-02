@@ -88,7 +88,7 @@ func HandlerGetTx(tmpl *template.Template, db database.DB) func(w http.ResponseW
 				txCtx.ExecutionEfficiency = fmt.Sprintf("%0.02fx", float64(txCtx.ExecutedBytes)/float64(txCtx.ChargedBytes))
 			}
 
-			txCtx.WitnessEvents = txExec.Events
+			txCtx.WitnessEvents = txExec.WitnessEvents
 
 			txCtx.WitnessTreeKeyValues = txExec.WitnessTreeKeyValues
 		}

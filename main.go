@@ -23,7 +23,7 @@ func main() {
 				ExecutedBytes:        125,
 				ChargedCodeChunks:    2,
 			},
-			Events: []database.WitnessEvent{
+			WitnessEvents: []database.WitnessEvent{
 				{Name: "ContractInit", Gas: 100},
 				{Name: "TouchFullAddress", Gas: 200},
 				{Name: "TouchAddressOnWrite", Gas: 500},

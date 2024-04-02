@@ -297,6 +297,12 @@
                                         <div class="col mr-2">
                                             <div
                                                 class="text font-weight-bold text-secondary text-gray-800 text-uppercase mb-2">
+                                                Current value</div>
+                                        </div>
+
+                                        <div class="col mr-2">
+                                            <div
+                                                class="text font-weight-bold text-secondary text-gray-800 text-uppercase mb-2">
                                                 Post-value</div>
                                         </div>
                                     </div>
@@ -308,7 +314,15 @@
                                         </div>
                                         <div class="col mr-2">
                                             <div class="text-secondary mb-1">
-                                                {{ .PostValue }} </div>
+                                                {{ if .CurrentValue }} {{ .CurrentValue }} {{ else }} absent {{ end }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col mr-2">
+                                            <div class="text-secondary mb-1">
+                                                {{ if or (eq .PostValue .CurrentValue) (not .PostValue) }} unchanged {{
+                                                else }}
+                                                {{ .PostValue }} {{ end }} </div>
                                         </div>
                                     </div>
                                     {{ end }}
