@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"math/big"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/jsign/verkle-explorer/database"
 	"github.com/shopspring/decimal"
+	"golang.org/x/sync/errgroup"
 )
 
 type txContext struct {
@@ -101,15 +103,27 @@ func HandlerGetTx(tmpl *template.Template, db database.DB) func(w http.ResponseW
 }
 
 func outputDashboard(db database.DB, tmpl *template.Template, w http.ResponseWriter) {
-	highGasTxs, err := db.GetHighestGasTxs(10)
-	if err != nil {
-		log.Printf("failed to execute template: %v", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	inefficientTxs, err := db.GetInefficientCodeAccessTxs(10)
-	if err != nil {
-		log.Printf("failed to execute template: %v", err)
+	group, _ := errgroup.WithContext(context.Background())
+
+	var highGasTxs []database.TxInfo
+	var inefficientTxs []database.TxInfo
+	group.Go(func() error {
+		var err error
+		highGasTxs, err = db.GetHighestGasTxs(10)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	group.Go(func() error {
+		var err error
+		inefficientTxs, err = db.GetInefficientCodeAccessTxs(10)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err := group.Wait(); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
