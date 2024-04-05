@@ -24,11 +24,13 @@ type txContext struct {
 	To          string
 	Value       string
 
-	TotalGas               uint64
-	ExecutionGas           uint64
-	ExecutionGasPercentage int
-	CodeChunkGas           uint64
-	CodeChunkGasPercentage int
+	TotalGas                    uint64
+	ExecutionGas                uint64
+	ExecutionGasPercentage      int
+	NonCodeWitnessGas           uint64
+	NonCodeWitnessGasPercentage int
+	CodeChunkGas                uint64
+	CodeChunkGasPercentage      int
 
 	ExecutedInstructions int
 	ExecutedBytes        uint64
@@ -37,6 +39,7 @@ type txContext struct {
 
 	WitnessEvents        []database.WitnessEvent
 	WitnessTreeKeyValues []database.WitnessTreeKeyValue
+	WitnessCharges       []database.WitnessCharges
 }
 
 type dashboardContext struct {
@@ -76,12 +79,6 @@ func HandlerGetTx(tmpl *template.Template, db database.DB) func(w http.ResponseW
 			value := decimal.NewFromBigInt(&biValue, -18)
 			txCtx.Value = value.String()
 
-			txCtx.TotalGas = txExec.TotalGas
-			txCtx.ExecutionGas = txExec.TotalGas - txExec.CodeChunkGas
-			txCtx.ExecutionGasPercentage = int(txCtx.ExecutionGas * 100 / txCtx.TotalGas)
-			txCtx.CodeChunkGas = txExec.CodeChunkGas
-			txCtx.CodeChunkGasPercentage = 100 - txCtx.ExecutionGasPercentage
-
 			txCtx.ExecutedInstructions = txExec.ExecutedInstructions
 			txCtx.ExecutedBytes = txExec.ExecutedBytes
 			txCtx.ChargedBytes = txExec.ChargedCodeChunks * 31
@@ -91,8 +88,21 @@ func HandlerGetTx(tmpl *template.Template, db database.DB) func(w http.ResponseW
 			}
 
 			txCtx.WitnessEvents = txExec.WitnessEvents
-
 			txCtx.WitnessTreeKeyValues = txExec.WitnessTreeKeyValues
+			txCtx.WitnessCharges = txExec.WitnessCharges
+
+			for _, c := range txCtx.WitnessCharges {
+				txCtx.NonCodeWitnessGas += c.Gas
+
+			}
+
+			txCtx.TotalGas = txExec.TotalGas
+			txCtx.ExecutionGas = txExec.TotalGas - txCtx.NonCodeWitnessGas - txExec.CodeChunkGas
+			txCtx.ExecutionGasPercentage = int(txCtx.ExecutionGas * 100 / txCtx.TotalGas)
+			txCtx.CodeChunkGas = txExec.CodeChunkGas
+			txCtx.CodeChunkGasPercentage = int(txCtx.CodeChunkGas * 100 / txCtx.TotalGas)
+			txCtx.NonCodeWitnessGasPercentage = 100 - txCtx.ExecutionGasPercentage - txCtx.CodeChunkGasPercentage
+
 		}
 		if err := tmpl.Execute(w, txCtx); err != nil {
 			log.Printf("failed to execute template: %v", err)
@@ -124,6 +134,7 @@ func outputDashboard(db database.DB, tmpl *template.Template, w http.ResponseWri
 		return nil
 	})
 	if err := group.Wait(); err != nil {
+		log.Printf("failed to retrieve dashboard info: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

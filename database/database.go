@@ -17,6 +17,7 @@ type TxExec struct {
 
 	WitnessEvents        []WitnessEvent
 	WitnessTreeKeyValues []WitnessTreeKeyValue
+	WitnessCharges       []WitnessCharges
 }
 
 type TxInfo struct {
@@ -37,6 +38,12 @@ type TxInfo struct {
 
 type WitnessEvent struct {
 	Name   string
+	Gas    uint64
+	Params string
+}
+
+type WitnessCharges struct {
+	Reason string
 	Gas    uint64
 	Params string
 }
