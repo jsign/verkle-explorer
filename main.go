@@ -23,12 +23,6 @@ func main() {
 				ExecutedBytes:        125,
 				ChargedCodeChunks:    2,
 			},
-			WitnessEvents: []database.WitnessEvent{
-				{Name: "ContractInit", Gas: 100},
-				{Name: "TouchFullAddress", Gas: 200},
-				{Name: "TouchAddressOnWrite", Gas: 500},
-				{Name: "ContractInitiCompletion", Gas: 800},
-			},
 			WitnessTreeKeyValues: []database.WitnessTreeKeyValue{
 				{Key: "0x02db80a48c552994cdcbd0fb08b9e76e59bfd3ea8c172f25c00e289dd4106f", PostValue: "0xdae346e3112395dc000000000000000000000000000000000000000000000000"},
 				{Key: "0x0591491d8fd2bb468a49a02040a4872fed9791b954295973fc7eb2cfd4aef0", PostValue: "0x7440000000000000000000000000000000000000000000000000000000000000"},

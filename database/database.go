@@ -15,7 +15,6 @@ type DB interface {
 type TxExec struct {
 	TxInfo
 
-	WitnessEvents        []WitnessEvent
 	WitnessTreeKeyValues []WitnessTreeKeyValue
 	WitnessCharges       []WitnessCharges
 }
